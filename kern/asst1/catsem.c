@@ -74,15 +74,15 @@ struct semaphore *resources;
  * There are 6 cats, so the cat array will have 6 elements.
  * There are 2 mice, so the mice array will have 2 elements.
  */
- int cats_iteration[6] = {0,0,0,0,0,0};
- int mice_iteration[2] = {0,0};
+ int cats[6] = {0,0,0,0,0,0};
+ int mice[2] = {0,0};
+
 
 /*
  *
  * Function Definitions
  *
  */
-
 
 /*
  * catsem()
@@ -110,6 +110,46 @@ catsem(void * unusedpointer,
 
         (void) unusedpointer;
         (void) catnumber;
+
+        // If the resource is available, acquire it.
+        P(resources);
+
+        // If the cat needs to be fed, then...
+        while (cats[catnumber] < 4){
+          // CRITICAL SECTION
+
+          // If the first bowl is available and there is no mouse,
+          // the cat should eat.
+          if (bowl1 == 0 && bowl2 != 2) {
+            // Acquire the resource.
+            bowl1 = 1;
+            // Cat eats.
+            clocksleep(1);
+            cats[catnumber] += 1;
+            // Release the resource.
+            bowl1 = 0;
+          }
+
+          // If the second bowl is available and there is no mouse,
+          // the cat should eat.
+          else if (bowl2 == 0 && bowl2 != 2) {
+            // Acquire the resource.
+            bowl2 = 1;
+            // Cat eats.
+            clocksleep(1);
+            cats[catnumber] += 1;
+            // Release the resource.
+            bowl2 = 0;
+          }
+        }
+
+        V(resources);
+        // REMAINDER SECTION
+
+        // Check to see if the cats are sufficiently fed.
+        if (cats[catnumber] >= 4){
+          // Kill the thread.
+        }
 }
 
 
@@ -140,6 +180,46 @@ mousesem(void * unusedpointer,
 
         (void) unusedpointer;
         (void) mousenumber;
+
+        // If the resource is available, acquire it.
+        P(resources);
+
+        // If the mouse needs to be fed, then...
+        while (mice[mousenumber] < 4){
+          // CRITICAL SECTION
+
+          // If the first bowl is available and there is no cat,
+          // the mouse should eat.
+          if (bowl1 == 0 && bowl2 != 2) {
+            // Acquire the resource.
+            bowl1 = 1;
+            // Mouse eats.
+            clocksleep(1);
+            mice[mousenumber] += 1;
+            // Release the resource.
+            bowl1 = 0;
+          }
+
+          // If the second bowl is available and there is no cat,
+          // the mouse should eat.
+          else if (bowl2 == 0 && bowl2 != 2) {
+            // Acquire the resource.
+            bowl2 = 1;
+            // Mouse eats.
+            clocksleep(1);
+            mice[mousenumber] += 1;
+            // Release the resource.
+            bowl2 = 0;
+          }
+        }
+
+        V(resources);
+        // REMAINDER SECTION
+
+        // Check to see if the mice are sufficiently fed.
+        if (mice[mousenumber] >= 4){
+          // Kill the thread.
+        }
 }
 
 
